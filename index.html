@@ -1,1 +1,754 @@
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Артем — Survivor & Future Developer | Rust Edition</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Permanent Marker, Share Tech Mono, Rajdhani -->
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        rust: {
+                            red: '#cd412b',
+                            darkred: '#8b2719',
+                            bg: '#0e0f11',
+                            panel: '#151618',
+                            card: '#1c1e22',
+                            border: '#33373e',
+                            wood: '#5c4028',
+                            metal: '#434952',
+                            text: '#d8dadf'
+                        }
+                    },
+                    fontFamily: {
+                        rust: ['Rajdhani', 'sans-serif'],
+                        mono: ['Share Tech Mono', 'monospace'],
+                        stencil: ['Permanent Marker', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Rust Industrial / Grunge Styling */
+        body {
+            background-color: #0c0d0e;
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(205, 65, 43, 0.12) 0%, rgba(12, 13, 14, 0.98) 80%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.3) 3px);
+            color: #d8dadf;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        /* Rust Panel Borders */
+        .rust-card {
+            background: rgba(23, 25, 29, 0.92);
+            border: 1px solid #2e333b;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 5px 20px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        .rust-card-accent {
+            border-top: 3px solid #cd412b;
+        }
+
+        /* Rust-styled Buttons */
+        .rust-btn {
+            background: linear-gradient(180deg, #333842 0%, #1e2127 100%);
+            border: 1px solid #484f5c;
+            color: #e2e4e9;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .rust-btn:hover {
+            background: linear-gradient(180deg, #cd412b 0%, #8b2719 100%);
+            border-color: #ff6b54;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(205, 65, 43, 0.5);
+        }
+
+        .rust-btn.active {
+            background: linear-gradient(180deg, #cd412b 0%, #9e2e1e 100%);
+            border-color: #ff8573;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(205, 65, 43, 0.7);
+        }
+
+        /* Inventory Slot styling */
+        .inv-slot {
+            background: rgba(14, 15, 17, 0.9);
+            border: 1px solid #363c47;
+            position: relative;
+            transition: border-color 0.2s;
+        }
+        .inv-slot:hover {
+            border-color: #cd412b;
+        }
+
+        /* Scanline Overlay Effect */
+        .rust-vignette {
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0e0f11; }
+        ::-webkit-scrollbar-thumb { background: #33373e; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #cd412b; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-rust-red selection:text-white rust-vignette">
+
+    <!-- TOP NAVIGATION / GAME MENU HEADER -->
+    <header class="sticky top-0 z-50 bg-rust-bg/95 border-b border-rust-border backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Rust Player Tag & Server Status -->
+            <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 rounded bg-rust-red/20 border-2 border-rust-red flex items-center justify-center font-stencil text-rust-red text-2xl shadow-lg">
+                    A
+                </div>
+                <div>
+                    <h1 class="font-rust font-bold text-white tracking-widest text-xl flex items-center gap-2">
+                        ARTYOM <span class="text-xs px-2 py-0.5 bg-rust-red text-white font-mono rounded-sm">DEV SURVIVOR</span>
+                    </h1>
+                    <div class="text-xs font-mono text-gray-400 flex items-center gap-3">
+                        <span class="flex items-center gap-1 text-green-400">
+                            <i class="fa-solid fa-signal text-[10px]"></i> PING: 12ms
+                        </span>
+                        <span class="text-rust-red font-bold">SERVER: RUST_CODE_OFFICIAL</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rust Navigation Menu Tabs -->
+            <nav class="flex items-center space-x-2 font-rust text-sm">
+                <button onclick="switchTab('home')" id="tab-home" class="rust-btn active px-4 py-2 rounded-sm flex items-center gap-2">
+                    <i class="fa-solid fa-user"></i> <span>Персонаж</span>
+                </button>
+                <button onclick="switchTab('gallery')" id="tab-gallery" class="rust-btn px-4 py-2 rounded-sm flex items-center gap-2">
+                    <i class="fa-solid fa-images"></i> <span>Мир Rust</span>
+                </button>
+                <button onclick="switchTab('contacts')" id="tab-contacts" class="rust-btn px-4 py-2 rounded-sm flex items-center gap-2">
+                    <i class="fa-solid fa-radio"></i> <span>Рация / Связь</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN GAME CONTENT -->
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full relative z-10">
+
+        <!-- ================= PAGE 1: HOME / PLAYER PROFILE ================= -->
+        <section id="page-home" class="space-y-8 animate-fade-in">
+            
+            <!-- Hero / Player Banner -->
+            <div class="rust-card rust-card-accent p-6 md:p-8 rounded-sm">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                    
+                    <div class="md:col-span-2 space-y-4">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-rust-red/10 border border-rust-red/40 text-rust-red font-mono text-xs uppercase tracking-widest">
+                            <i class="fa-solid fa-biohazard"></i> Survivor Log #771
+                        </div>
+                        
+                        <h2 class="text-3xl sm:text-5xl font-rust font-extrabold text-white tracking-wide uppercase leading-tight">
+                            Привет! Я <span class="text-rust-red">Артем</span>
+                        </h2>
+                        
+                        <p class="text-xl font-mono text-rust-red font-semibold">
+                            "Я хочу быть программистом и выживать в мире кода!"
+                        </p>
+                        
+                        <p class="text-gray-300 text-sm leading-relaxed">
+                            Добро пожаловать в мой профиль выжившего разработчика! Я изучаю программирование, создаю свои первые приложения, играю в Rust и строю крепкие фундаментальные знания для успешной карьеры в IT.
+                        </p>
+
+                        <!-- Quick Action Button -->
+                        <div class="pt-2">
+                            <button onclick="switchTab('contacts')" class="rust-btn px-6 py-3 rounded-sm text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-headset text-rust-red"></i> Связаться с Артемом
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Player Model Graphic / Avatar Box -->
+                    <div class="rust-card p-4 rounded-sm border border-rust-border bg-black/40 text-center space-y-3">
+                        <div class="relative w-28 h-28 mx-auto rounded-full bg-gradient-to-b from-rust-red to-black p-1">
+                            <div class="w-full h-full rounded-full bg-rust-card flex items-center justify-center text-4xl text-rust-red">
+                                <i class="fa-solid fa-user-ninja"></i>
+                            </div>
+                            <span class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-black rounded-full"></span>
+                        </div>
+                        <div>
+                            <div class="font-rust font-bold text-white text-lg">ARTYOM_DEV</div>
+                            <div class="font-mono text-xs text-rust-red">LEVEL 10 PROGRAMMER</div>
+                        </div>
+                        <div class="text-xs font-mono text-gray-400 bg-black/60 p-2 rounded border border-rust-border">
+                            "Ready to craft code & build projects"
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- RUST HUD SURVIVAL STATS -->
+            <div>
+                <h3 class="font-rust font-bold text-xl text-white mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-heart-pulse text-rust-red"></i> СТАТУСЫ ВЫЖИВАНИЯ (HUD STATS)
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 font-mono text-xs">
+                    
+                    <!-- Health -->
+                    <div class="rust-card p-4 rounded-sm border-l-4 border-l-green-500 flex items-center gap-3">
+                        <i class="fa-solid fa-heart text-green-500 text-2xl"></i>
+                        <div class="w-full">
+                            <div class="flex justify-between text-gray-400 mb-1">
+                                <span>HEALTH</span>
+                                <span class="text-green-400 font-bold">100 / 100</span>
+                            </div>
+                            <div class="w-full bg-black h-2 rounded-full overflow-hidden">
+                                <div class="bg-green-500 h-full w-full"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calories -->
+                    <div class="rust-card p-4 rounded-sm border-l-4 border-l-yellow-500 flex items-center gap-3">
+                        <i class="fa-solid fa-drumstick-bite text-yellow-500 text-2xl"></i>
+                        <div class="w-full">
+                            <div class="flex justify-between text-gray-400 mb-1">
+                                <span>CALORIES</span>
+                                <span class="text-yellow-400 font-bold">500 / 500</span>
+                            </div>
+                            <div class="w-full bg-black h-2 rounded-full overflow-hidden">
+                                <div class="bg-yellow-500 h-full w-full"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Water -->
+                    <div class="rust-card p-4 rounded-sm border-l-4 border-l-blue-500 flex items-center gap-3">
+                        <i class="fa-solid fa-droplet text-blue-500 text-2xl"></i>
+                        <div class="w-full">
+                            <div class="flex justify-between text-gray-400 mb-1">
+                                <span>HYDRATION</span>
+                                <span class="text-blue-400 font-bold">250 / 250</span>
+                            </div>
+                            <div class="w-full bg-black h-2 rounded-full overflow-hidden">
+                                <div class="bg-blue-500 h-full w-full"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code Level -->
+                    <div class="rust-card p-4 rounded-sm border-l-4 border-l-rust-red flex items-center gap-3">
+                        <i class="fa-solid fa-radiation text-rust-red text-2xl"></i>
+                        <div class="w-full">
+                            <div class="flex justify-between text-gray-400 mb-1">
+                                <span>DEV POWER</span>
+                                <span class="text-rust-red font-bold">MAX INTENT</span>
+                            </div>
+                            <div class="w-full bg-black h-2 rounded-full overflow-hidden">
+                                <div class="bg-rust-red h-full w-4/5"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- RUST CRAFTING & SKILLS TREE / INVENTORY -->
+            <div>
+                <h3 class="font-rust font-bold text-xl text-white mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-cubes text-rust-red"></i> ИНВЕНТАРЬ НАВЫКОВ (CRAFTING TREE)
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    
+                    <!-- Skill 1 -->
+                    <div class="inv-slot p-4 rounded-sm rust-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-xs font-mono text-rust-red">SLOT 01</span>
+                            <i class="fa-brands fa-html5 text-3xl text-orange-500"></i>
+                        </div>
+                        <h4 class="font-rust font-bold text-lg text-white">HTML5 & CSS3</h4>
+                        <p class="text-xs text-gray-400 font-mono mt-1">Основа верстки, стильные структуры страниц и адаптивный UI.</p>
+                        <div class="mt-4 pt-2 border-t border-rust-border flex justify-between text-xs font-mono">
+                            <span class="text-gray-500">CRAFT LEVEL</span>
+                            <span class="text-green-400 font-bold">LEARNED</span>
+                        </div>
+                    </div>
+
+                    <!-- Skill 2 -->
+                    <div class="inv-slot p-4 rounded-sm rust-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-xs font-mono text-rust-red">SLOT 02</span>
+                            <i class="fa-brands fa-js text-3xl text-yellow-400"></i>
+                        </div>
+                        <h4 class="font-rust font-bold text-lg text-white">JavaScript</h4>
+                        <p class="text-xs text-gray-400 font-mono mt-1">Интерактивная логика, обработка событий, динамика сайтов.</p>
+                        <div class="mt-4 pt-2 border-t border-rust-border flex justify-between text-xs font-mono">
+                            <span class="text-gray-500">CRAFT LEVEL</span>
+                            <span class="text-yellow-400 font-bold">IN PROGRESS</span>
+                        </div>
+                    </div>
+
+                    <!-- Skill 3 -->
+                    <div class="inv-slot p-4 rounded-sm rust-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-xs font-mono text-rust-red">SLOT 03</span>
+                            <i class="fa-brands fa-python text-3xl text-blue-400"></i>
+                        </div>
+                        <h4 class="font-rust font-bold text-lg text-white">Python Basics</h4>
+                        <p class="text-xs text-gray-400 font-mono mt-1">Алгоритмы, скрипты автоматизации и логика программирования.</p>
+                        <div class="mt-4 pt-2 border-t border-rust-border flex justify-between text-xs font-mono">
+                            <span class="text-gray-500">CRAFT LEVEL</span>
+                            <span class="text-yellow-400 font-bold">STUDYING</span>
+                        </div>
+                    </div>
+
+                    <!-- Skill 4 -->
+                    <div class="inv-slot p-4 rounded-sm rust-card">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-xs font-mono text-rust-red">SLOT 04</span>
+                            <i class="fa-brands fa-git-alt text-3xl text-red-500"></i>
+                        </div>
+                        <h4 class="font-rust font-bold text-lg text-white">Git & GitHub</h4>
+                        <p class="text-xs text-gray-400 font-mono mt-1">Версионность кода, создание репозиториев и хостинг на GitHub.</p>
+                        <div class="mt-4 pt-2 border-t border-rust-border flex justify-between text-xs font-mono">
+                            <span class="text-gray-500">CRAFT LEVEL</span>
+                            <span class="text-green-400 font-bold">READY</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Quote / Message -->
+            <div class="rust-card p-5 rounded-sm border-l-4 border-l-rust-red font-mono text-xs sm:text-sm text-gray-300">
+                <span class="text-rust-red font-bold">[NOTE FROM ARTYOM]:</span> "Как и в Rust, чтобы построить неприступную базу (надежный код), нужны крепкие ресурсоемкие знания и практика каждый день!"
+            </div>
+
+        </section>
+
+
+        <!-- ================= PAGE 2: GALLERY RUST WORLD ================= -->
+        <section id="page-gallery" class="space-y-6 hidden animate-fade-in">
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-rust-border pb-4">
+                <div>
+                    <h2 class="font-rust text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-mountain-sun text-rust-red"></i> ГАЛЕРЕЯ МИРА RUST
+                    </h2>
+                    <p class="text-xs font-mono text-gray-400">Атмосферные локации, постройки и памятники выживания</p>
+                </div>
+                <!-- Gallery Filter Buttons -->
+                <div class="flex gap-2 font-rust text-xs">
+                    <button onclick="filterRustGallery('all')" class="gallery-btn rust-btn px-3 py-1.5 rounded-sm active">ВСЕ</button>
+                    <button onclick="filterRustGallery('bases')" class="gallery-btn rust-btn px-3 py-1.5 rounded-sm">БАЗЫ</button>
+                    <button onclick="filterRustGallery('monuments')" class="gallery-btn rust-btn px-3 py-1.5 rounded-sm">ПАМЯТНИКИ</button>
+                    <button onclick="filterRustGallery('survival')" class="gallery-btn rust-btn px-3 py-1.5 rounded-sm">ВЫЖИВАНИЕ</button>
+                </div>
+            </div>
+
+            <!-- Gallery Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Item 1: Base -->
+                <div class="rust-card rounded-sm overflow-hidden group cursor-pointer rust-gallery-item" data-category="bases" onclick="openModal('Суровые Крепости Rust', 'Многоуровневая металлическая база для защиты от рейдов в ночном биоме.', 'base')">
+                    <div class="relative h-48 bg-gray-900 overflow-hidden">
+                        <svg class="w-full h-full object-cover group-hover:scale-105 transition duration-500" viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="400" height="225" fill="#12161f" />
+                            <!-- Mountains background -->
+                            <path d="M0 160 L90 80 L180 140 L290 60 L400 160 L400 225 L0 225 Z" fill="#1c2330" />
+                            <!-- Metal Fort Base -->
+                            <rect x="150" y="90" width="100" height="100" fill="#383e4a" stroke="#222" stroke-width="2" />
+                            <polygon points="150,90 200,50 250,90" fill="#4f5666" />
+                            <rect x="180" y="140" width="40" height="50" fill="#1a1c24" stroke="#cd412b" stroke-width="2" />
+                            <!-- Searchlight beam -->
+                            <polygon points="200,50 120,0 280,0" fill="#ffecb3" opacity="0.15" />
+                        </svg>
+                        <span class="absolute top-2 left-2 bg-black/80 text-rust-red border border-rust-red font-mono text-[10px] px-2 py-0.5 rounded-sm">
+                            METAL FORTRESS
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-rust font-bold text-lg text-white group-hover:text-rust-red transition">Укрепленная База</h4>
+                        <p class="text-xs text-gray-400 font-mono mt-1">Защищенный бункер из бронированного металла для сохранения ресурсов.</p>
+                    </div>
+                </div>
+
+                <!-- Item 2: Monument -->
+                <div class="rust-card rounded-sm overflow-hidden group cursor-pointer rust-gallery-item" data-category="monuments" onclick="openModal('Сфера (Dome)', 'Один из самых узнаваемых памятников в Rust для лута.', 'monument')">
+                    <div class="relative h-48 bg-gray-900 overflow-hidden">
+                        <svg class="w-full h-full object-cover group-hover:scale-105 transition duration-500" viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="400" height="225" fill="#291a10" />
+                            <!-- Sunset background -->
+                            <circle cx="200" cy="140" r="100" fill="#cd412b" opacity="0.6" />
+                            <!-- Dome Monument Mesh -->
+                            <circle cx="200" cy="110" r="70" fill="none" stroke="#5c4028" stroke-width="4" stroke-dasharray="8,4" />
+                            <circle cx="200" cy="110" r="50" fill="none" stroke="#2b1f14" stroke-width="3" />
+                            <rect x="190" y="160" width="20" height="65" fill="#1c140e" />
+                        </svg>
+                        <span class="absolute top-2 left-2 bg-black/80 text-rust-red border border-rust-red font-mono text-[10px] px-2 py-0.5 rounded-sm">
+                            MONUMENT: DOME
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-rust font-bold text-lg text-white group-hover:text-rust-red transition">Монумент "Сфера"</h4>
+                        <p class="text-xs text-gray-400 font-mono mt-1">Опасное восхождение на самый верх сферы за ценными компонентами.</p>
+                    </div>
+                </div>
+
+                <!-- Item 3: Survival -->
+                <div class="rust-card rounded-sm overflow-hidden group cursor-pointer rust-gallery-item" data-category="survival" onclick="openModal('Ночной костер выжившего', 'Тепло и уют у костра во время холодной ночи в лесу.', 'fire')">
+                    <div class="relative h-48 bg-gray-900 overflow-hidden">
+                        <svg class="w-full h-full object-cover group-hover:scale-105 transition duration-500" viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="400" height="225" fill="#090a0c" />
+                            <!-- Fire light glow -->
+                            <circle cx="200" cy="160" r="80" fill="#ff7700" opacity="0.25" />
+                            <polygon points="190,170 200,120 210,170" fill="#ff4500" />
+                            <polygon points="195,170 200,135 205,170" fill="#ffcc00" />
+                            <!-- Wood logs -->
+                            <line x1="170" y1="175" x2="230" y2="175" stroke="#5c4028" stroke-width="8" />
+                        </svg>
+                        <span class="absolute top-2 left-2 bg-black/80 text-rust-red border border-rust-red font-mono text-[10px] px-2 py-0.5 rounded-sm">
+                            CAMPFIRE NIGHT
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-rust font-bold text-lg text-white group-hover:text-rust-red transition">Ночной Костер</h4>
+                        <p class="text-xs text-gray-400 font-mono mt-1">Обогрев, жарка еды и приготовление к следующему дню выживания.</p>
+                    </div>
+                </div>
+
+                <!-- Item 4: Monument Launch Site -->
+                <div class="rust-card rounded-sm overflow-hidden group cursor-pointer rust-gallery-item" data-category="monuments" onclick="openModal('Космодром (Launch Site)', 'Зона высокого риска и радиации с Bradley APC.', 'launch')">
+                    <div class="relative h-48 bg-gray-900 overflow-hidden">
+                        <svg class="w-full h-full object-cover group-hover:scale-105 transition duration-500" viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="400" height="225" fill="#1b1e24" />
+                            <!-- Rocket Silo / Tower -->
+                            <rect x="170" y="30" width="60" height="170" fill="#353b47" stroke="#111" stroke-width="2" />
+                            <polygon points="170,30 200,5 230,30" fill="#cd412b" />
+                            <!-- Crane -->
+                            <line x1="230" y1="50" x2="310" y2="50" stroke="#ffaa00" stroke-width="4" />
+                        </svg>
+                        <span class="absolute top-2 left-2 bg-black/80 text-rust-red border border-rust-red font-mono text-[10px] px-2 py-0.5 rounded-sm">
+                            LAUNCH SITE
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-rust font-bold text-lg text-white group-hover:text-rust-red transition">Космодром</h4>
+                        <p class="text-xs text-gray-400 font-mono mt-1">Гигантский исследовательский комплекс с топовым военным лутом.</p>
+                    </div>
+                </div>
+
+                <!-- Item 5: Base Wood/Stone -->
+                <div class="rust-card rounded-sm overflow-hidden group cursor-pointer rust-gallery-item" data-category="bases" onclick="openModal('Первая стартовая база 2x2', 'Классический старт любого игрока в Rust.', 'starter')">
+                    <div class="relative h-48 bg-gray-900 overflow-hidden">
+                        <svg class="w-full h-full object-cover group-hover:scale-105 transition duration-500" viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="400" height="225" fill="#2d3328" />
+                            <!-- Starter cabin -->
+                            <rect x="140" y="100" width="120" height="80" fill="#5c4028" stroke="#3b2818" stroke-width="3" />
+                            <rect x="185" y="130" width="30" height="50" fill="#2b1a0e" stroke="#cd412b" stroke-width="1" />
+                        </svg>
+                        <span class="absolute top-2 left-2 bg-black/80 text-rust-red border border-rust-red font-mono text-[10px] px-2 py-0.5 rounded-sm">
+                            STARTER 2x2
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-rust font-bold text-lg text-white group-hover:text-rust-red transition">Стартовая Дощатая База</h4>
+                        <p class="text-xs text-gray-400 font-mono mt-1">Первое надежное укрытие от диких зверей и других выживших.</p>
+                    </div>
+                </div>
+
+                <!-- Item 6: Survival Helicopters -->
+                <div class="rust-card rounded-sm overflow-hidden group cursor-pointer rust-gallery-item" data-category="survival" onclick="openModal('Миникоптер (Minicopter)', 'Быстрое перемещение по карте сверху.', 'copters')">
+                    <div class="relative h-48 bg-gray-900 overflow-hidden">
+                        <svg class="w-full h-full object-cover group-hover:scale-105 transition duration-500" viewBox="0 0 400 225" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="400" height="225" fill="#14181c" />
+                            <!-- Minicopter sketch -->
+                            <line x1="100" y1="80" x2="300" y2="80" stroke="#888" stroke-width="4" />
+                            <rect x="180" y="90" width="50" height="40" fill="#cd412b" />
+                            <circle cx="160" cy="150" r="15" fill="#333" />
+                            <circle cx="240" cy="150" r="15" fill="#333" />
+                        </svg>
+                        <span class="absolute top-2 left-2 bg-black/80 text-rust-red border border-rust-red font-mono text-[10px] px-2 py-0.5 rounded-sm">
+                            MINICOPTER FLIGHT
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-rust font-bold text-lg text-white group-hover:text-rust-red transition">Воздушный Миникоптер</h4>
+                        <p class="text-xs text-gray-400 font-mono mt-1">Возможность быстро исследовать всю карту острова с воздуха.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ================= PAGE 3: CONTACTS & SIGNAL TOWER ================= -->
+        <section id="page-contacts" class="space-y-8 hidden animate-fade-in">
+            
+            <div class="border-b border-rust-border pb-4">
+                <h2 class="font-rust text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-tower-cell text-rust-red"></i> СИГНАЛЬНАЯ ВЫШКА / РАЦИЯ СВЯЗИ
+                </h2>
+                <p class="text-xs font-mono text-gray-400">Прямой контакт с Артемом для сотрудничества и совместных проектов</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Main Phone Contact Rust Card -->
+                <div class="space-y-4">
+                    
+                    <div class="rust-card p-6 rounded-sm bg-gradient-to-br from-rust-panel to-black border-2 border-rust-red">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-14 h-14 rounded bg-rust-red/20 border-2 border-rust-red flex items-center justify-center text-rust-red text-2xl">
+                                <i class="fa-solid fa-phone-volume animate-bounce"></i>
+                            </div>
+                            <div>
+                                <span class="font-mono text-xs text-rust-red uppercase tracking-wider">ПРЯМОЙ НОМЕР ВЫЖИВШЕГО</span>
+                                <h3 class="font-rust text-2xl sm:text-3xl font-black text-white">
+                                    +7 771 522 06 75
+                                </h3>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 font-rust text-xs">
+                            <a href="tel:+77715220675" class="rust-btn py-3 px-3 rounded-sm text-center flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-phone text-green-400"></i> ВЫЗОВ
+                            </a>
+                            <a href="https://wa.me/77715220675" target="_blank" class="rust-btn py-3 px-3 rounded-sm text-center flex items-center justify-center gap-2">
+                                <i class="fa-brands fa-whatsapp text-green-500"></i> WHATSAPP
+                            </a>
+                            <button onclick="copyPhone()" class="rust-btn py-3 px-3 rounded-sm text-center flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-copy text-yellow-400"></i> СКОПИРОВАТЬ
+                            </button>
+                        </div>
+                        
+                        <div id="copy-toast" class="hidden mt-3 p-2 bg-green-900/50 border border-green-500 text-green-300 font-mono text-xs text-center rounded-sm">
+                            <i class="fa-solid fa-check"></i> Номер скопирован в буфер обмена!
+                        </div>
+                    </div>
+
+                    <!-- Additional Social / Tech Channels -->
+                    <div class="rust-card p-6 rounded-sm space-y-4">
+                        <h4 class="font-rust font-bold text-sm text-gray-300 border-b border-rust-border pb-2">
+                            ДОПОЛНИТЕЛЬНЫЕ РАДИОЧАСТОТЫ
+                        </h4>
+
+                        <div class="space-y-3 font-mono text-xs sm:text-sm">
+                            <a href="https://github.com" target="_blank" class="flex items-center justify-between p-3 rounded-sm bg-black/40 hover:bg-rust-red/20 border border-rust-border transition">
+                                <span class="flex items-center gap-3 text-white">
+                                    <i class="fa-brands fa-github text-xl text-purple-400"></i> GitHub Profile
+                                </span>
+                                <span class="text-rust-red">OPEN <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+                            </a>
+
+                            <div class="flex items-center justify-between p-3 rounded-sm bg-black/40 border border-rust-border">
+                                <span class="flex items-center gap-3 text-white">
+                                    <i class="fa-brands fa-discord text-xl text-indigo-400"></i> Discord Channel
+                                </span>
+                                <span class="text-gray-400">ArtyomRustDev#7710</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Rust Radio Pager Form -->
+                <div class="rust-card p-6 rounded-sm">
+                    <div class="flex items-center justify-between mb-4 border-b border-rust-border pb-2">
+                        <span class="font-rust font-bold text-sm text-white flex items-center gap-2">
+                            <i class="fa-solid fa-walkie-talkie text-rust-red"></i> ПЕРЕДАТЬ СООБЩЕНИЕ ПО РАЦИИ
+                        </span>
+                        <span class="font-mono text-[10px] text-rust-red border border-rust-red/40 px-2 py-0.5">FREQ: 91.5 MHz</span>
+                    </div>
+
+                    <form id="rust-form" onsubmit="sendRadioMessage(event)" class="space-y-4 font-mono text-xs">
+                        <div>
+                            <label class="block text-gray-400 mb-1">ПОЗЫВНОЙ / ВАШЕ ИМЯ</label>
+                            <input type="text" required placeholder="Введите ваше имя..." 
+                                class="w-full bg-black/80 border border-rust-border focus:border-rust-red rounded-sm p-3 text-white outline-none transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-400 mb-1">КОНТАКТ ДЛЯ СВЯЗИ (ТЕЛЕФОН ИЛИ EMAIL)</label>
+                            <input type="text" required placeholder="Ваш номер или почта..." 
+                                class="w-full bg-black/80 border border-rust-border focus:border-rust-red rounded-sm p-3 text-white outline-none transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-400 mb-1">ТЕКСТ РАДИОСООБЩЕНИЯ</label>
+                            <textarea rows="4" required placeholder="Напишите предложение или сообщение..." 
+                                class="w-full bg-black/80 border border-rust-border focus:border-rust-red rounded-sm p-3 text-white outline-none transition"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full rust-btn py-3 rounded-sm font-rust text-sm font-bold flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane text-rust-red"></i> ПЕРЕДАТЬ В ЭФИР
+                        </button>
+                    </form>
+
+                    <!-- Confirmation Message -->
+                    <div id="radio-sent-msg" class="hidden mt-4 p-4 rounded-sm bg-green-900/40 border border-green-500 text-green-300 font-mono text-xs text-center">
+                        <i class="fa-solid fa-satellite-dish text-lg mb-1 block"></i>
+                        Сигнал передан! Артем примет сообщение на свой КПК и ответит.
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- RUST FOOTER -->
+    <footer class="bg-rust-bg border-t border-rust-border py-4 mt-12 relative z-10 font-mono text-xs">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-gray-500">
+            <div>
+                © 2026 ARTYOM DEV. DESIGNED WITH <span class="text-rust-red font-bold">RUST SURVIVAL</span> STYLE.
+            </div>
+            <div class="flex items-center gap-4 text-gray-400">
+                <span><i class="fa-solid fa-phone text-rust-red"></i> +77715220675</span>
+                <span>|</span>
+                <span>MAP: PROCEDURAL ISLAND</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL FOR GALLERY ITEM VIEW -->
+    <div id="image-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex items-center justify-center p-4">
+        <div class="rust-card max-w-lg w-full p-6 rounded-sm relative border-2 border-rust-red">
+            <button onclick="closeModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 id="modal-title" class="font-rust font-bold text-xl text-white mb-2"></h3>
+            <p id="modal-desc" class="font-mono text-xs text-gray-300 mb-4"></p>
+            <div class="text-center pt-2">
+                <button onclick="closeModal()" class="rust-btn px-6 py-2 rounded-sm text-xs">ЗАКРЫТЬ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT INTERACTION & LOGIC -->
+    <script>
+        // Tab switching logic
+        function switchTab(tabName) {
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+
+            const selectedPage = document.getElementById(`page-${tabName}`);
+            const selectedTab = document.getElementById(`tab-${tabName}`);
+
+            if (selectedPage && selectedTab) {
+                selectedPage.classList.remove('hidden');
+                selectedTab.classList.add('active');
+            }
+
+            playRustClickSound();
+        }
+
+        // Gallery Filter logic
+        function filterRustGallery(category) {
+            const items = document.querySelectorAll('.rust-gallery-item');
+            const buttons = document.querySelectorAll('.gallery-btn');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            items.forEach(item => {
+                if (category === 'all' || item.getAttribute('data-category') === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            playRustClickSound();
+        }
+
+        // Copy Phone Number Function
+        function copyPhone() {
+            const tempInput = document.createElement("input");
+            tempInput.value = "+77715220675";
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            const toast = document.getElementById('copy-toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 4000);
+
+            playRustClickSound();
+        }
+
+        // Send radio message form handler
+        function sendRadioMessage(e) {
+            e.preventDefault();
+            const form = document.getElementById('rust-form');
+            const msg = document.getElementById('radio-sent-msg');
+
+            form.reset();
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 5000);
+
+            playRustClickSound();
+        }
+
+        // Modal View handlers
+        function openModal(title, desc) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('image-modal').classList.remove('hidden');
+            playRustClickSound();
+        }
+
+        function closeModal() {
+            document.getElementById('image-modal').classList.add('hidden');
+            playRustClickSound();
+        }
+
+        // UI Click Sound Generator using Web Audio API
+        function playRustClickSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.04);
+
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.04);
+            } catch (e) {
+                // Audio Context might require prior interaction
+            }
+        }
+    </script>
+</body>
+</html>
+
